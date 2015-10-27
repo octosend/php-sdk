@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tutoriel OctoSend</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+<body>
+
+<h1>OctoSend PHP SDK</h1>
+
+<h2>Survol</h2>
+
+<p>
+Le OctoSend propose un service de gestion de campaignes emailing.
+L'utilisteur dispose d'un ou plusieurs domaines d'envoi, lui permettant
+de créer des campagnes de mails, de suivre leur déroulé, et de récupérer
+des statistiques.
+</p>
+
+<p>
+Le SDK PHP est une surcouche permettant d'accéder au service OctoSend
+à travers une abstraction objet PHP masquant les appels direct à l'API.
+</p>
+
+<h2>Utilisation du client</h2>
+
+<p>
+Pour utiliser le service OctoSend, il faut commencer par instancier un
+connecteur au service avec ses paramètres d'identification.
+</p>
+
+<pre>
+require "vendor/autoload.php";
+
+define('USERNAME',  '...');
+define('PASSWORD',  '...');
+
+$client = new OctoSend\Client(USERNAME, PASSWORD);
+</pre>
+
+<p>
+Cet appel retourne un objet client à partir duquel seront fait
+tous les appels à l'API.  Ce client est non-connecté, c'est à
+dire que l'objet ne conserve pas un connection permanente au
+serveur pendant la durée de vie de l'objet, mais se connecte
+pour effectier les appels REST.
+</p>
+    
+<h2>Liste des domaines</h2>
+
+Compter les domaines accessibles.
+
+
+<pre>
+// compter les domaines
+//
+$n = $client->domains()->count()
+print_r($n);
+</pre>
+
+
+Recupérer les 10 premiers domains.
+
+<pre>
+// recuperation des 10 premiers domaines
+//
+$domains = $client->domains()->fetch(0, 10);
+foreach($domains => $domain) {
+    print_r($domain->name());
+}
+</pre>
+
+Filtrer les domaines.
+
+<pre>
+// recuperer le nombre et la liste des domaines associces a cet utilisateur
+// contenant "demo." dans le nom
+//
+$filter = $client->domains();
+$filter->nameContains("demo.");
+$filter->count();
+$domains = $filter->fetch(0, 10);
+foreach($domains => $domain) {
+    print_r($domain->name());
+}
+</pre>
+
+
+<h2>Création d'une campagne</h2>
+
+<h3>Schema général</h3>
+
+<p>
+La première étape consiste à choisir le domaine d'envoi de la campagne.
+On récupère l'objet directement par le nom de domain.
+</p>
+
+<pre>
+// recuperer un connecteur vers un domain specifique
+//
+$domain = $client->domain("demo.octosend.com");
+</pre>
+
+<p>
+On crée ensuite un objet <i>spooler</i> qui représente la campagne en question,
+auquel on associe un nom et une date de lancement.
+</p>
+
+<pre>
+// creer une campagne pour ce domaine et la configurer
+//
+$spooler = $domain->createSpooler("campaign");
+$spooler->name("ma campagne");      // nom unique libre
+$spooler->start(time() + 86400);    // timestamp de debut de campagne dans 24h
+</pre>
+
+<p>
+Chaque spooler possède un identifiant unique appelé <i>token</i> qui permet
+de le retrouver par la suite.
+</p>
+
+<pre>
+$token = $spooler->token();
+print_r($token);
+</pre>
+
+<p>
+On défini ensuite le contenu du message pour cette campagne. Pour cela
+on crée un objet <i>message</i> associé au spooler sur lequel on
+spécifie plusieurs élements: l'expéditeur, le sujet, les différentes
+parties du message.  Une fois finalisé, le message doit être
+enregistré dans le spooler.
+</p>
+
+<pre>
+// composition
+//
+$message = $spooler->message();
+$message->sender("John Doe <john.doe@demo.octosend.com>");
+$message->subject("de belles chaussures !");
+$message->parts()->part("text/html", "&lt;html&gt;voici mon contenu html&lt;/html&gt");
+$message->parts()->part("text/plain", "voici mon contenu texte");
+$message->save(); // enregistrement sur le spooler
+</pre>
+
+<p>
+Une fois le spooler configuré et le message défini, on ajoute des
+destinataires.  On crée un mail avec l'adresse de destination, et on
+ajoute (<i>spool</i>) ce mail au spooler.
+</p>
+
+<pre>
+$spooler->mail("gilles@rentabiliweb.com")->spool();
+</pre>
+
+
+<p>
+Pour optimiser le nombre d'appels à l'API, il est souhaitable d'ajouter les
+destinataires par lots.  On construit un objet <i>batch</i> auxquels
+sont ajoutés les destinataires.  C'est cet objet qui est ensuite <i>spoolé</i>
+en un seul appel à l'API.
+</p>
+
+<pre>
+$batch = $spooler->batch();
+$batch->mail("eric@rentabiliweb.com");
+$batch->mail("gilles@rentabiliweb.com");
+$batch->mail("antoine@rentabiliweb.com");
+$batch->spool();
+</pre>
+
+<p>
+La dernière étape consiste à marquer le spooler comme étant prêt à
+partir.  Le système déclanchera le lancement de la campagne à la date
+indiquée.  Après cet appel la campagne ne peut plus être modifiée.
+</p>
+
+<pre>
+$spooler->ready();
+</pre>
+
+<h3>Variables de suivi</h3>
+
+<p>
+Le contenu du message peut contenir des variables de suivi (<i>tracking</i>) qui sont dynamiquements remplacées au moment formatage des mails,
+et qui permettent d'activer au besoin le suivi des évènememnts sur les mails de cette campagnes.
+Elles apparaissent entre double accolades dans les contenus.
+Ces variables sont les suivantes:
+</p>
+
+<ul>
+<li>unsubscribe</li>: une URL permettant de prendre en compte le souhait d'un utilisateur de se desinscrire de la liste.
+<li>mirror</li>: une URL permettant de voir le contenu du message en ligne.
+<li>click:http://...</li>: une URL permttant de rediriger l'utilisateur verus l'adresse donné en comptabilisant l'activation du lien.
+<li>pixel</li>: une balise HTML permettant de comptabiliser l'ouverture du mail.
+</ul>
+
+<pre>
+// composition d'un message avec tracking
+//
+$message = $spooler->message();
+$message->sender("John Doe <john.doe@demo.octosend.com>");
+$message->subject("de belles chaussures !");
+$message->parts()->part("text/html", "&lt;html&gt;voici mon contenu html		\
+	avec un &lt;a href='{{unsubscribe}}'&gt;lien de desinscription&lt;/a&gt;,		\
+	un &lt;a href='{{mirror}}'&gt;lien de consultation en ligne&lt;/a&gt;,		\
+	un &lt;a href='{{click:http://www.example.com}}'&gt;lien de tracking&lt;/a&gt;	\
+	et un {{pixel}} d'ouverture				    		\
+	&lt;/html&gt;");
+$message->parts()->part("text/plain", "voici mon contenu texte");
+$message->save();
+</pre>
+
+
+<h3>Variables de personnalisation</h3>
+
+<p>
+L'utilisateur peut aussi spécifier ses propres variables pour personnaliser le contenu
+des mails. La syntaxe sera la même que pour les variables de suivi.
+</p>
+
+<pre>
+// composition d'un message avec tracking+variables
+//
+$message = $spooler->message();
+$message->sender("John Doe <john.doe@demo.octosend.com>");
+$message->subject("de belles chaussures, {{prenom}}!");
+$message->parts()->part("text/html", "&lt;html&gt;voici mon contenu html		\
+	avec un &lt;a href='{{unsubscribe}}'&gt;lien de desinscription&lt;/a&gt;,		\
+	un &lt;a href='{{mirror}}'&gt;lien de consultation en ligne&lt;/a&gt;,		\
+	un &lt;a href='{{click:http://www.example.com}}'&gt;lien de tracking&lt;/a&gt;	\
+	un {{pixel}} d'ouverture					    	\
+	ainsi que quelques variables {{nom}}, {{prenom}}			\
+	&lt;/html&gt;");
+$message->parts()->part("text/plain", "voici mon contenu texte");
+$message->save();
+</pre>
+
+
+<p>
+Les variables sont données pour chaque destinataire au moment de la création des mails
+lors de la phase de spool:
+</p>
+
+<pre>
+// spooler un ensemble de destinataires avec des variables
+//
+$batch = $spooler->batch();
+
+$mail = $batch->mail("eric@rentabiliweb.com");
+$message = $mail->message();
+$message->variables(["prenom" => "eric", "nom" => "faurot"]);
+
+$mail = $batch->mail("gilles@rentabiliweb.com");
+$message = $mail->message();
+$message->variables(["prenom" => "gilles", "nom" => "chehade"]);
+
+$mail = $batch->mail("antoine@rentabiliweb.com");
+$message = $mail->message();
+$message->variables(["prenom" => "antoine", "nom" => "preteux"]);
+
+$batch->spool();
+</pre>
+
+
+<h2>Récupération d'une campagne existante</h2>
+
+
+<p>
+  Lors de leurs création, les campagnes se voient assigner un idenfiant unique:
+  <pre>
+    $token = $spooler->token();
+  </pre>
+
+  Cet identifiant peut être sauvegardé côté client et permets de recharger une
+  campagne ultérieurement:
+  <pre>
+    $spooler = $client->spooler($token);
+  </pre>
+  
+</p>
+
+
+
+    <h2>Récupération des résultats</h2>
+
+<pre>
+// Une fois votre campagne lancée, vous pouvez récupérer les statistiques
+// de cette campagne. On commence par récupérer le spooler par son token.
+// Vous devez spécifier le type d'agrégation que vous souhaitez.
+// $agregation peut-être : router, router+domain, router+provider, domain, provider, global
+// router : Les routeurs sont les entitées qui routent vos mails
+// domain : Les domaines représentes les domaines de déstination
+//   (yahoo.fr, yahoo.com, orange.fr,...)
+// provider : Les providers représentes les domaines regroupté par entités :
+//   Microsoft = outlook.fr, outlook.com, hotmail.fr, etc.
+// router+domain : Par router et par domain
+// router+provider : Par router et par provider
+$statistics = $spooler->statistics($agregation)
+print_r($statistics)
+
+// Vous aurez de nombreux compteurs d'éléments et d'événement qui sont arrivé pendant
+// votre campagne.
+// Dans 'Activity', vous disposez des compteurs d'activités suivant : 
+// 'Open' : Nombre de déstinataire qui ont ouvert le mail
+// 'click' : Nombre de déstinataire qui ont clic-é sur un lien dans le mail
+// 'mirror': Nombre de déstinataire qui ont accédé à la version mirroir du mail.
+// Dans 'Routing', vous disposez de compteur sur les événements de routage.
+// 'Ok': est le nombre de message remis à leur destinataire.
+// 'Tempfail' : est le nombre de message qui n'ont pas pu être remis et qui seront
+// réssayé plus tard.
+// 'Permfail' : est le nombre de message qui n'ont pas pu être remis à leurs destinataire.
+// Dans 'Spooling' : Vous avez des compteurs sur votre spooler
+// 'count' : Nombre messages spoolé
+// 'blocked' : Nombre de messages blocké (avant d'être envoyé)
+// 'quarantine' : Nombre de message en quarantaine.
+//
+
+</pre>
+
+</body>
+
+</html>

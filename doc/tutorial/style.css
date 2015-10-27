@@ -1,0 +1,29 @@
+a {
+    text-decoration: none;
+    color: #08f;
+}
+a:visited {
+    color: #08f;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+p {
+    text-align: justify;
+}
+
+p, ul, ol {
+    max-width: 680px;
+}
+
+pre {
+    background: #fbfbfb;
+    border: 1px solid #ddd;
+    padding-left: 1em;
+    padding-bottom: .5em;
+    padding-top: .5em;
+
+    width: 652px;
+    
+}

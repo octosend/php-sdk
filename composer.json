@@ -1,0 +1,19 @@
+{
+    "name": "octosend/octosender",
+    "description": "OctoSend API client implementation for PHP >= 5.4.0",
+    "keywords": ["octosend", "mail"],
+    "type": "library",
+    "license": "ISC",
+    
+    "require": {
+            "php": ">=5.4.0"
+    },
+    
+    "version": "1.0.0",
+
+    "autoload": {
+        "psr-4" : {
+            "OctoSend\\" : "src/OctoSend"
+        }
+    }
+}
