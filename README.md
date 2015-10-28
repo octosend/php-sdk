@@ -10,13 +10,21 @@
 
 ## Overview
 
+OctoSend provide a mailling campaign service. The user can use one or many sending domains and is able to create campaign, follow their evolutions and retrieve statistics.
+
 ## Description
+
+The PHP SDK is a tools used to access OctoSend services by a PHP abstraction hiding direct API calls
 
 ## Setup
 
-Think about the dependancies.
+You can either clone it directly form our repository, or add it to your favorite dependency management tool
 
 ## Usage
+
+Feel free to read you french [wiki page](https://github.com/octosend/php-sdk/wiki).
+
+An english version will arrive soon.
 
 ## Development
 
