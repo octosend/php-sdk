@@ -1,4 +1,4 @@
-# SDK-PHP ![License badge][license-img]
+# SDK-PHP ![License badge][license-img] [![Packagist badge][packagist-img]][packagist-url]
 
 #### Table of Contents
 
@@ -66,4 +66,7 @@ JE VEUX DES OCTOCHIIIIIIIIIPS !!!
                                        |
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
-[license-img]: https://img.shields.io/badge/license-ISC-blue.svg "License"
+[license-img]: https://img.shields.io/badge/license-ISC-blue.svg
+[packagist-img]: https://img.shields.io/packagist/dt/octosend/php-sdk.svg
+[packagist-url]: https://packagist.org/packages/octosend/php-sdk
+
