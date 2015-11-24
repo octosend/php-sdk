@@ -29,7 +29,7 @@ class API
                 $this->_url = $url . '/api/' . $version;
                 $this->_key = null;
         }
-        
+
         function _get_domain_from_name($name)
         {
                 $md = $this->domain_get($name);
@@ -40,28 +40,28 @@ class API
         {
                 return new Domain($this, $md);
         }
-        
+
         function _get_spooler_from_token($token)
         {
                 $md = $this->spoolers_get($token);
                 return $this->_get_spooler_from_md($md);
         }
-        
+
         function _get_spooler_from_md($md)
         {
                 return new Spooler($this, $md);
         }
-        
+
         function _get_mail_from_md($md)
         {
                 return new Mail($this, $md);
         }
-        
+
         function _get_template_from_md($domainname, $md)
         {
                 return new Template($this, $domainname, $md);
         }
-        
+
         function rest_call($remote_method, $params = null, $verb = 'POST')
         {
                 $cparams = [
@@ -75,9 +75,9 @@ class API
                 ];
                 if ($this->_key)
                         $cparams['http']['header'][] = 'X-RMTA-API-Key: '.$this->_key;
-                
+
                 $url = $this->_url . '/' . $remote_method;
-                
+
                 if ($params !== null) {
                         if ($verb == 'POST') {
                                 $params = json_encode($params);
@@ -91,17 +91,17 @@ class API
                                 $url .= '?'.$params;
                         }
                 }
-                
+
                 $context = stream_context_create($cparams);
                 $fp = fopen($url, 'rb', false, $context);
                 if (!$fp)
                         throw new Exception("fopen() failed");
-                
+
                 $ret = stream_get_contents($fp);
                 fclose($fp);
                 if ($ret === false)
                         throw new Exception("stream_get_contents() failed");
-                
+
                 $http_version = null;
                 $http_status_code = null;
                 $http_status = null;
@@ -118,7 +118,7 @@ class API
                                 $http_headers[trim($t[0])] = trim($t[1]);
                         }
                 }
-                
+
                 if ($http_headers["Content-Type"] == "application/json") {
                         $content = json_decode($ret, true);
                         if (json_last_error() !== JSON_ERROR_NONE)
@@ -126,13 +126,13 @@ class API
                 } else {
                         $content = $ret;
                 }
-                
+
                 if ($http_status_code != "200")
                         throw new APIError($http_version, $http_status_code, $http_status, $http_headers, $content);
-                
+
                 return $content;
         }
-        
+
         function authenticate($username, $password)
         {
                 $json = $this->rest_call('authenticate', [
@@ -143,7 +143,7 @@ class API
                         throw new RemoteCallError("authentication failed");
                 $this->_key  = $json["api-key"];
         }
-        
+
         /* Domains */
         function domains_count($args)
         {
@@ -156,7 +156,7 @@ class API
                 }
                 return $this->rest_call('domains/count', $params, "POST");
         }
-        
+
         function domains_fetch($args, $offset, $limit, $reverse)
         {
                 $params = [];
@@ -169,24 +169,24 @@ class API
                         }
                 return $this->rest_call('domains/fetch', $params, "POST");
         }
-        
+
         function domains_create($name)
         {
                 $params = ['domain' => $name ];
                 return $this->rest_call('domains/create', $params, "POST");
         }
-        
+
         function domains_delete($name)
         {
                 $params = ['domain' => $name ];
                 return $this->rest_call('domains/delete', $params, "POST");
         }
-        
+
         function domain_get($name)
         {
                 return $this->rest_call('domain/'.$name, null, "GET");
         }
-        
+
         /* Spoolers */
         function spoolers_count($args)
         {
@@ -199,7 +199,7 @@ class API
                 }
                 return $this->rest_call('spoolers/count', $params, "POST");
         }
-        
+
         function spoolers_fetch($args, $offset, $limit, $reverse)
         {
                 $params = [];
@@ -212,13 +212,13 @@ class API
                         }
                 return $this->rest_call('spoolers/fetch', $params);
         }
-        
+
         function spoolers_create($domain, $type)
         {
                 $params = ['domain' => $domain, 'type' => $type ];
                 return $this->rest_call('spoolers/create', $params);
         }
-        
+
         function spoolers_get($token)
         {
                 return $this->rest_call('spooler/'.$token, null, "GET");
@@ -375,7 +375,7 @@ class API
                 return $this->rest_call($url, $params, "POST");
         }
 
-        
+
         /* Spooler Message Parts */
         function spooler_message_parts_part($spooler_token, $type, $content)
         {
@@ -427,7 +427,7 @@ class API
                 #}
                 return $this->rest_call('spooler/' . $spooler_token . '/preview', null, "POST");
         }
-        
+
         function spooler_spool_draft($spooler_token, $emails)
         {
                 $params = [];
@@ -501,8 +501,8 @@ class API
                 if ($args != null)
                         foreach ($args as $k => $v)
                                 $params[$k] = $v;
-		
-                return $this->rest_call('templates/domain/' . $domainname . '/fetch', $params); 
+
+                return $this->rest_call('templates/domain/' . $domainname . '/fetch', $params);
         }
 
         function templates_domain_get($domainname, $name)
@@ -510,7 +510,7 @@ class API
                 $params = [];
                 $params['name'] = $name;
 
-                return $this->rest_call('templates/domain/' . $domainname . '/get', $params); 
+                return $this->rest_call('templates/domain/' . $domainname . '/get', $params);
         }
 
         function templates_domain_get_content($domainname, $name)
@@ -518,7 +518,7 @@ class API
                 $params = [];
                 $params['name'] = $name;
 
-                return $this->rest_call('templates/domain/' . $domainname . '/get-content', $params); 
+                return $this->rest_call('templates/domain/' . $domainname . '/get-content', $params);
         }
 
         function templates_domain_create($domainname, $name, $type, $content)
@@ -528,7 +528,7 @@ class API
                 $params['type'] = $type;
                 $params['content'] = $content;
 
-                return $this->rest_call('templates/domain/' . $domainname . '/create', $params); 
+                return $this->rest_call('templates/domain/' . $domainname . '/create', $params);
         }
 
         function templates_domain_set_content($domainname, $name, $content)
@@ -536,8 +536,8 @@ class API
                 $params = [];
                 $params['name'] = $name;
                 $params['content'] = $content;
-		
-                return $this->rest_call('templates/domain/' . $domainname . '/set-content', $params); 
+
+                return $this->rest_call('templates/domain/' . $domainname . '/set-content', $params);
         }
 
         function templates_domain_remove($domainname, $name)
@@ -545,12 +545,12 @@ class API
                 $params = [];
                 $params['name'] = $name;
 
-                return $this->rest_call('templates/domain/' . $domainname . '/remove', $params); 
+                return $this->rest_call('templates/domain/' . $domainname . '/remove', $params);
         }
 
 
-	
-	
+
+
         /* Events */
         function events_count($kind, $identifier, $event)
         {
@@ -598,6 +598,12 @@ class API
                 if ($format)
                         $params["groupBy"] = $format;
                 return $this->rest_call('statistics/spooler/'.$token, $params, "POST");
+        }
+
+        /* Tools */
+        function html_to_text($html)
+        {
+            return $this->rest_call('/tools/html-to-text', ['html' : $html], 'POST');
         }
 }
 
