@@ -17,7 +17,7 @@
 
 namespace OctoSend;
 
-define('OCTOSEND_API_URL',	'https://api.octosend.com');
+define('OCTOSEND_API_URL',	'https://api.octosend.com/api');
 define('OCTOSEND_API_VERSION',	'3.0');
 
 class API
@@ -603,7 +603,7 @@ class API
         /* Tools */
         function html_to_text($html)
         {
-            return $this->rest_call('/tools/html-to-text', ['html' : $html], 'POST');
+            return $this->rest_call('/tools/html-to-text', ['html' => $html], 'POST');
         }
 }
 

@@ -39,6 +39,9 @@ class Client
 
         function statistics($period, $format, $timestamp = null)
         { return $this->_api->statistics_global($period, $format, $timestamp); }
+
+        function tools()
+        { return new Tools($this->_api); }
 }
 
 ?>
