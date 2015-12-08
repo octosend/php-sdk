@@ -19,24 +19,27 @@ namespace OctoSend;
 
 class SpoolerBatch
 {
-        function __construct($ctx, $token)
-        {
-                $this->_ctx    = $ctx;
-                $this->_token  = $token;
-                $this->_mails = [];
-        }
+    function __construct($ctx, $token)
+    {
+        $this->_ctx    = $ctx;
+        $this->_token  = $token;
+        $this->_mails  = [];
+    }
 
-        function mail($email)
-        {
-                $m = new Mail($this->_ctx, $this->_token, $email);
-                array_push($this->_mails, $m);
-                return $m;
-        }
-        
-        function spool()
-        {
-                return $this->_ctx->spooler_spool_batch($this->_token, $this->_mails);
-        }
+    function mail($email)
+    {
+        $m = new Mail($this->_ctx, $this->_token, $email);
+        array_push($this->_mails, $m);
+        return $m;
+    }
+
+    function spool()
+    {
+        return $this->_ctx->spooler_spool_batch($this->_token, $this->_mails);
+    }
+
+    function draft()
+    {
+        return $this->_ctx->spooler_spool_draft($this->_token, $this->_mails);
+    }
 }
-
-?>
