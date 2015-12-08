@@ -4,12 +4,12 @@
     "keywords": ["octosend", "mail"],
     "type": "library",
     "license": "ISC",
-    
+
     "require": {
             "php": ">=5.4.0"
     },
-    
-    "version": "1.0.1",
+
+    "version": "1.0.2",
 
     "autoload": {
         "psr-4" : {
