@@ -36,7 +36,7 @@ class MessageParts
                 $this->_attachments = $attachments;
                 $this->_unsubscribe = $unsubscribe;
         }
-        
+
         function _serialize()
         {
                 $ret = [];
@@ -55,7 +55,7 @@ class MessageParts
                 $this->_attachments = null;
                 $this->_unsubscribe = null;
         }
-        
+
         function part($type, $content)
         {
                 if ($this->_parts == null)
@@ -64,11 +64,17 @@ class MessageParts
                 array_push($this->_parts, $id);
         }
 
-        function attachment($type, $content)
+        function attachment($type, $content, $filename)
         {
                 if ($this->_attachments == null)
                         $this->_attachments = [];
-                $id = $this->_ctx->spooler_resources_attachment($this->_token, $this->_scope, $type, $content);
+                $id = $this->_ctx->spooler_resources_attachment(
+                    $this->_token,
+                    $this->_scope,
+                    $type,
+                    $content,
+                    $filename
+                );
                 array_push($this->_attachments, $id);
         }
 

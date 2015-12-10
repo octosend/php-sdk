@@ -347,11 +347,13 @@ class API
                 return $this->rest_call($url, $params, "POST");
         }
 
-        function spooler_resources_attachment($spooler_token, $scope, $type, $content)
+        function spooler_resources_attachment($spooler_token, $scope, $type, $content, $filename)
         {
-                $params = [];
-                $params["type"] = $type;
-                $params["content"] = base64_encode($content);
+                $params = [
+                    'type'     => $type,
+                    'content'  => base64_encode($content),
+                    'filename' => $filename
+                ];
 
                 $url = "/404";
                 if ($scope == "spooler")
