@@ -26,7 +26,7 @@ class API
         {
                 $url = $url == null ? OCTOSEND_API_URL : $url;
                 $version = $version == null ? OCTOSEND_API_VERSION : $version;
-                $this->_url = $url . '/' . $version;
+                $this->_url = $url . '/' . $version . '/';
                 $this->_key = null;
         }
 
@@ -605,7 +605,7 @@ class API
         /* Tools */
         function html_to_text($html)
         {
-            return $this->rest_call('/tools/html-to-text', ['html' => $html], 'POST');
+            return $this->rest_call('tools/html-to-text', ['html' => $html], 'POST');
         }
 }
 
