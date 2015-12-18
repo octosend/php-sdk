@@ -9,7 +9,7 @@
             "php": ">=5.4.0"
     },
 
-    "version": "1.0.3",
+    "version": "1.0.4",
 
     "autoload": {
         "psr-4" : {
