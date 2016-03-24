@@ -602,6 +602,12 @@ class API
                 return $this->rest_call('statistics/spooler/'.$token, $params, "POST");
         }
 
+        function score_spooler($token)
+        {
+                $params = [];
+                return $this->rest_call('/scoring/spooler/'.$token.'/message', $params, "GET");
+        }
+
         /* Tools */
         function html_to_text($html)
         {

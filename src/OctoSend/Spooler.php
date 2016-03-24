@@ -55,7 +55,7 @@ class Spooler
                 $this->_message->_reload($this->_ctx->get_spooler_message($this->_token));
                 return $this->_message;
         }
-        
+
         function name($name = null)
         {
                 if ($name === null)
@@ -89,7 +89,7 @@ class Spooler
         {
                 $this->_ctx->spooler_finish($this->_token);
         }
-        
+
         function cancel()
         {
                 $this->_ctx->spooler_cancel($this->_token);
@@ -104,7 +104,7 @@ class Spooler
         {
                 return new MailsFilter($this->_ctx, $this->_token);
         }
-        
+
         function events($type)
         {
                 return new Events($this->_ctx, "spooler", $this->_token, $type);
@@ -113,6 +113,11 @@ class Spooler
         function statistics($format = null)
         {
                 return new Statistics($format, $this->_ctx->statistics_spooler($this->_token, $format));
+        }
+
+        function score()
+        {
+                return new Score($this->_ctx->score_spooler($this->_token));
         }
 
         function batch()
