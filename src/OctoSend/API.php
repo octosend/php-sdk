@@ -82,7 +82,7 @@ class API
                         if ($verb == 'POST') {
                                 $params = json_encode($params);
                                 if (json_last_error() !== JSON_ERROR_NONE)
-                                        throw new Exception("cannot decode JSON parameters");
+                                        throw new \Exception("cannot decode JSON parameters");
                                 $cparams['http']['content'] = $params;
                         }
                         else {
@@ -95,12 +95,12 @@ class API
                 $context = stream_context_create($cparams);
                 $fp = fopen($url, 'rb', false, $context);
                 if (!$fp)
-                        throw new Exception("fopen() failed");
+                        throw new \Exception("fopen() failed");
 
                 $ret = stream_get_contents($fp);
                 fclose($fp);
                 if ($ret === false)
-                        throw new Exception("stream_get_contents() failed");
+                        throw new \Exception("stream_get_contents() failed");
 
                 $http_version = null;
                 $http_status_code = null;
@@ -122,7 +122,7 @@ class API
                 if ($http_headers["Content-Type"] == "application/json") {
                         $content = json_decode($ret, true);
                         if (json_last_error() !== JSON_ERROR_NONE)
-                                throw new Exception("cannot decode JSON response");
+                                throw new \Exception("cannot decode JSON response");
                 } else {
                         $content = $ret;
                 }
