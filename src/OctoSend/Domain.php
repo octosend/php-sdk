@@ -63,6 +63,26 @@ class Domain
                 return new Statistics($format, $this->_ctx->statistics_domain($this->_metadata['name'],
                         $period, $format, $timestamp));
         }
+
+        public function sendTransactionnalEmail(
+            $fromEmail,
+            $fromName,
+            $toEmail,
+            $toName = null,
+            $subject,
+            $html = null,
+            $text = null,
+            array $tags = [],
+            $draft = false
+        ) {
+            if (is_null($html) && is_null($text)) {
+
+                throw new \Exception("No HTML nor text content specified");
+            }
+
+            return $this->_ctx->domain_send_transactionnal($this->_metadata['name'], $fromEmail, $fromName,
+                $toEmail, $toName, $subject, $html, $text, $tags);
+        }
 }
 
 ?>

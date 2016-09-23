@@ -106,6 +106,7 @@ class API
                 $http_status_code = null;
                 $http_status = null;
                 $http_headers = array();
+
                 foreach($http_response_header as $k => $v) {
                         if ($k == 0) {
                                 $t = explode(' ', $v, 3);
@@ -185,6 +186,52 @@ class API
         function domain_get($name)
         {
                 return $this->rest_call('domain/'.$name, null, "GET");
+        }
+
+        function domain_send_transactionnal(
+            $name,
+            $fromEmail,
+            $fromName,
+            $toEmail,
+            $toName = null,
+            $subject,
+            $html = null,
+            $text = null,
+            array $tags = [],
+            $draft = false
+        ) {
+            $params = [
+                'fromEmail' => $fromEmail,
+                'fromName' => $fromName,
+                'toEmail' => $toEmail,
+                'subject' => $subject,
+                'tags' => $tags,
+                'parts' => [],
+                'draft' => $draft
+            ];
+
+            if ($toName) {
+
+                $params['toName'] = $toName;
+            }
+
+            if ($html) {
+
+                $params['parts'][] = [
+                    "type" => "text/html",
+                    "content" => $html
+                ];
+            }
+
+            if ($text) {
+
+                $params['parts'][] = [
+                    "type" => "text/plain",
+                    "content" => $text
+                ];
+            }
+
+            return $this->rest_call("domain/$name/transactional/send-mail", $params, "POST");
         }
 
         /* Spoolers */
