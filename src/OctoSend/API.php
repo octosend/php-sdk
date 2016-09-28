@@ -652,7 +652,7 @@ class API
         function score_spooler($token)
         {
                 $params = [];
-                return $this->rest_call('/scoring/spooler/'.$token.'/message', $params, "GET");
+                return $this->rest_call('scoring/spooler/'.$token.'/message', $params, "GET");
         }
 
         /* Tools */
