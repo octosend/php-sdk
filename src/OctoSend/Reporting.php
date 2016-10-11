@@ -78,7 +78,7 @@ class Reporting
      */
     public function each()
     {
-        $this->handle = fopen("compress.zlib://".$this->url, 'r');
+        $this->handle = @fopen("compress.zlib://".$this->url, 'r');
 
         if (false === $this->handle) {
 
