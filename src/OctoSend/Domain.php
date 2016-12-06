@@ -83,6 +83,36 @@ class Domain
             return $this->_ctx->domain_send_transactionnal($this->_metadata['name'], $fromEmail, $fromName,
                 $toEmail, $toName, $subject, $html, $text, $tags);
         }
+
+
+        /**
+         * Get reporting for specified $flux and $date
+         *
+         * @param string $flux the flux name
+         * @param \DateTime $date the date
+         */
+        public function reporting(
+            $flux = Reporting::TYPE_ACTIVITY,
+            \DateTime $date
+        ) {
+
+            if (!in_array(
+                $flux,
+                [
+                    Reporting::TYPE_ACTIVITY,
+                    Reporting::TYPE_SPOOLING,
+                    Reporting::TYPE_ROUTING,
+                    Reporting::TYPE_CLEANUP
+                ])
+            ) {
+
+                throw new \InvalidArgumentException("Invalid flux '$flux'");
+            }
+
+            $filename = $this->_ctx->domain_reporting_get_filename($this->_metadata['name'], $flux, $date->format('Y-m-d'));
+
+            return new Reporting($filename);
+        }
 }
 
 ?>

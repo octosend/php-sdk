@@ -116,7 +116,7 @@ class API
                         }
                         else {
                                 $t = explode( ':', $v, 2);
-                                $http_headers[trim($t[0])] = trim($t[1]);
+                                $http_headers[trim($t[0])] = isset($t[1])?trim($t[1]):'';
                         }
                 }
 
@@ -126,6 +126,11 @@ class API
                                 throw new \Exception("cannot decode JSON response");
                 } else {
                         $content = $ret;
+                }
+
+                //Handle redirect, return new Location
+                if ($http_status_code == "302") {
+                    return $http_headers['Location'];
                 }
 
                 if ($http_status_code != "200")
@@ -233,6 +238,16 @@ class API
 
             return $this->rest_call("domain/$name/transactional/send-mail", $params, "POST");
         }
+
+        function domain_reporting_get_filename(
+            $name,
+            $flux,
+            $date
+        ) {
+
+            return $this->rest_call("reporting/domains/{$name}_{$flux}_{$date}.json.gz", [], "GET");
+        }
+
 
         /* Spoolers */
         function spoolers_count($args)
