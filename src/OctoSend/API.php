@@ -220,19 +220,19 @@ class API
                 $params['toName'] = $toName;
             }
 
-            if ($html) {
-
-                $params['parts'][] = [
-                    "type" => "text/html",
-                    "content" => $html
-                ];
-            }
-
             if ($text) {
 
                 $params['parts'][] = [
                     "type" => "text/plain",
                     "content" => $text
+                ];
+            }
+
+            if ($html) {
+
+                $params['parts'][] = [
+                    "type" => "text/html",
+                    "content" => $html
                 ];
             }
 
