@@ -203,7 +203,8 @@ class API
             $html = null,
             $text = null,
             array $tags = [],
-            $draft = false
+            $draft = false,
+            $tracking = true
         ) {
             $params = [
                 'fromEmail' => $fromEmail,
@@ -234,6 +235,10 @@ class API
                     "type" => "text/html",
                     "content" => $html
                 ];
+            }
+
+            if($tracking===false) {
+                $params['tracking'] = false;
             }
 
             return $this->rest_call("domain/$name/transactional/send-mail", $params, "POST");
