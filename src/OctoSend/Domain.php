@@ -73,7 +73,8 @@ class Domain
             $html = null,
             $text = null,
             array $tags = [],
-            $draft = false
+            $draft = false,
+            $tracking = true
         ) {
             if (is_null($html) && is_null($text)) {
 
@@ -81,7 +82,7 @@ class Domain
             }
 
             return $this->_ctx->domain_send_transactionnal($this->_metadata['name'], $fromEmail, $fromName,
-                $toEmail, $toName, $subject, $html, $text, $tags);
+                $toEmail, $toName, $subject, $html, $text, $tags, $draft, $tracking);
         }
 
 
